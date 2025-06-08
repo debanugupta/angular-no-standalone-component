@@ -16,7 +16,15 @@ import { EmployeeInfo } from '../model/employee';
 })
 export class EmployeeAddComponent implements OnInit {
   public employeeList : EmployeeInfo[] = [] ;
-  public employee : any = {};
+  public employee : EmployeeInfo = 
+  {
+    emp_id:0,
+    emp_code:'',
+    emp_name:'',
+    emp_mobile:0,
+    emp_email:''
+  };
+
 
     constructor(
     private _employeeService : EmployeeService,
@@ -24,16 +32,57 @@ export class EmployeeAddComponent implements OnInit {
   }
 
   ngOnInit(){
-    this.employeeList = this._employeeService.getEmployeeList();
+    // this.employeeList = this._employeeService.getEmployeeList();
+    this.loadEmployees();
   }
 
-  addRecord(){
+  loadEmployees(): void {
+      this._employeeService
+      .getEmployeeInfo()
+      .subscribe(
+        (res: EmployeeInfo[]) => {
+          next: 
+          {
+            this.employeeList = res; 
+            console.log('employeeList',res);
+          };
+          error: (e: any) => 
+            { 
+              console.log('LoadEmployees Error',e) 
+            }
+        },
+        
+      );
+    }
+
+  // addRecord(){
+  //   var lastNo = this.employeeList[this.employeeList.length-1].emp_id;
+  //   if (lastNo == null)
+  //     lastNo = 0;
+  //   this.employee.emp_id = lastNo +1;
+  //   this._employeeService.addEmployeeInfo(this.employee);
+  //   this.navigateUrl();
+  // }
+
+  addEmployee() {
     var lastNo = this.employeeList[this.employeeList.length-1].emp_id;
     if (lastNo == null)
       lastNo = 0;
     this.employee.emp_id = lastNo +1;
-    this._employeeService.addEmployeeInfo(this.employee);
-    this.navigateUrl();
+    this._employeeService.addEmployee(this.employee)
+    .subscribe(
+        (res: EmployeeInfo) => {
+          next: 
+          {
+            console.log('Added employee',res);
+            this.navigateUrl();
+          };
+          error: (e: any) => 
+            { 
+              console.log('addEmployee Error',e) 
+            }
+        },
+      );
   }
 
   navigateUrl(){
